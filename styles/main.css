@@ -1,0 +1,13 @@
+.btn_record {
+    background-color: rgb(48, 48, 188);
+    color: white;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.recorder {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 10000;
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Extension mau",
+    "description": "Dung Extension!",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": ["storage"],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://login.cybersoft.edu.vn/*"],
+            "js": ["js/content.js"],
+            "css": ["styles/main.css"],
+            "run_at": "document_idle"
+        }
+    ],
+    "browser_action": {
+        "default_popup": "index.html"
+    }
+}
