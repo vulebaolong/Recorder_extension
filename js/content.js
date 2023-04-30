@@ -5,6 +5,7 @@ const wait = function (seconds) {
         setTimeout(resolve, seconds);
     });
 };
+
 window.onload = function () {
     const body = document.querySelector("body");
     const elementString = `
@@ -12,6 +13,7 @@ window.onload = function () {
         <button class="btn_record start_recoding">start recoding</button> 
         <a href="" class="btn_record download-video-btn">Download</a>
         <button class="btn_record test123">click</button> 
+        <button class="btn_record send">send</button> 
     </div>
     `;
     body.insertAdjacentHTML("afterbegin", elementString);
@@ -19,87 +21,15 @@ window.onload = function () {
 
     const btn = document.querySelector(".start_recoding");
     const btn2 = document.querySelector(".test123");
-    btn.addEventListener("click", () => {
-        startRecording();
-    });
+    const btn3 = document.querySelector(".send");
+    btn.addEventListener("click", () => {});
 
-    btn2.addEventListener("click", async () => {
-        console.log(123);
-        const list =
-            document.querySelector("#example-panel").children[0].children[0].children;
+    btn2.addEventListener("click", async () => {});
 
-        for (let i = 0; i < list.length; i++) {
-            const e = list[i];
-            if (i === 1) {
-                e.children[0].children[0].click();
-                await wait(500);
-                console.log(document.querySelector("video"));
-                const durationNum = document.querySelector("video").duration;
-                const duration = `${durationNum}`.replace(".", "");
-                console.log(+duration);
-                await wait(+duration);
-                console.log("đi tiếp");
-                // listenerChild(parentEl)
-            }
-            if (i > 0) {
-                console.dir(e.children[0].children[0].innerText);
-            }
-            await wait(1000);
-        }
+    btn3.addEventListener("click", () => {
+        sendMessage("getIDandGetStream");
     });
 };
-
-let chunks = [];
-let mediaRecorder;
-
-async function setupStream() {
-    try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({
-            video: true,
-            audio: true,
-        });
-
-        return stream;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-async function startRecording() {
-    const stream = await setupStream();
-    stream.getVideoTracks()[0].onended = function () {
-        console.log(123);
-        stopRecording();
-    };
-    mediaRecorder = new MediaRecorder(stream);
-
-    mediaRecorder.ondataavailable = function (e) {
-        chunks.push(e.data);
-    };
-
-    mediaRecorder.onstop = handleStop;
-
-    mediaRecorder.start(200);
-
-    return mediaRecorder;
-}
-
-function handleStop() {
-    const blob = new Blob(chunks, { type: "video/webm" });
-
-    const downloadBtn = $(".download-video-btn");
-
-    downloadBtn.href = URL.createObjectURL(blob);
-    downloadBtn.download = `recorded-video.webm`;
-
-    chunks = [];
-
-    console.log("Recording stop .....");
-}
-
-function stopRecording() {
-    mediaRecorder.stop();
-}
 
 function listenerChild(parentEl) {
     return new Promise(function (resolve, reject) {
@@ -110,9 +40,69 @@ function listenerChild(parentEl) {
         const observer = new MutationObserver(callback);
 
         const targetNodes = parentEl;
+        console.log(targetNodes);
         observer.observe(targetNodes, observerOptions);
         function callback(mutations) {
             console.log(mutations);
+            console.log(mutations[0].target);
+            console.log(mutations[0].target.children[0]);
+            observer.disconnect();
+            resolve(mutations[0].target.children[0]);
         }
+    });
+}
+
+function sendMessage(mes) {
+    chrome.runtime.sendMessage(mes, (e) => {
+        console.log(e);
+    });
+}
+
+async function start() {
+    const list =
+        document.querySelector("#example-panel").children[0].children[0].children;
+    // click thằng đầu tiên
+    list[1].children[0].children[0].click();
+
+    // const parentVideo1 =
+    //     document.querySelector(".ant-modal-body").children[0].children[0].children[0]
+    //         .children[0];
+    // //lắng nghe cái div bọc thẻ video
+    // const parentVideo2 = await listenerChild(parentVideo1);
+    // // lắng nghe thẻ video
+
+    // const video = await listenerChild(parentVideo2);
+    const video = document.querySelector("video");
+    for (let i = 0; i < list.length; i++) {
+        const e = list[i];
+        if (i === 1) {
+        }
+        if (i > 0) {
+            if (i > 1) e.children[0].children[0].click();
+            await loadVideo(video);
+            video.play();
+            const duration = `${video.duration}`.replace(".", "");
+            const name = e.children[0].children[0].innerText;
+            console.log(name, +duration);
+            // await wait(+duration);
+            await wait(+duration);
+            sendMessage({ title: "cutVideo", duration, name });
+            console.log("đi tiếp");
+            // await wait(+duration);
+        }
+    }
+}
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log(request);
+    sendResponse({ reMessage: "phản hồi lại từ content => option" });
+    start();
+});
+
+async function loadVideo(video) {
+    return new Promise((resolve, reject) => {
+        video.onloadedmetadata = () => {
+            resolve(123);
+        };
     });
 }

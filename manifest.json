@@ -1,24 +1,52 @@
 {
-    "name": "Extension mau",
-    "description": "Dung Extension!",
+    "name": "Recoder vlbl",
+    "description": "Recoder",
     "version": "1.0",
     "manifest_version": 3,
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "background.js",
+        "type": "module"
     },
-    "permissions": ["storage"],
+    "permissions": [
+        "desktopCapture",
+        "tabCapture",
+        "activeTab",
+        "<all_urls>",
+        "identity",
+        "identity.email",
+        "storage",
+        "tabGroups",
+        "scripting",
+        "tabs",
+        "tab",
+        "Tab",
+        "http://*/*",
+        "https://*/*",
+        "chrome-extension://*"
+    ],
+    "host_permissions": ["http://*/*", "https://*/*"],
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup/popup.html"
     },
+    "options_page": "option/option.html",
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "fontawesome/webfonts/*",
+                "fontawesome/css/*",
+                "audio/request.mp3",
+                "click_chat_end/*",
+                "macro_coppy/*"
+            ],
+            "matches": ["https://login.cybersoft.edu.vn/*"]
+        }
+    ],
     "content_scripts": [
         {
             "matches": ["https://login.cybersoft.edu.vn/*"],
             "js": ["js/content.js"],
             "css": ["styles/main.css"],
-            "run_at": "document_idle"
+            "all_frames": true
         }
-    ],
-    "browser_action": {
-        "default_popup": "index.html"
-    }
+    ]
 }
