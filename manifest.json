@@ -8,6 +8,7 @@
         "type": "module"
     },
     "permissions": [
+        "options",
         "desktopCapture",
         "tabCapture",
         "activeTab",

@@ -17,6 +17,7 @@ async function getStream() {
     streamGlobal.getVideoTracks()[0].onended = function () {
         stopRecording();
     };
+    setupVideoFeedback();
     return;
 }
 
@@ -36,7 +37,7 @@ function handleStop() {
     downloadBtn.href = URL.createObjectURL(blob);
     downloadBtn.download = `${nameVideo.replace(" ", "_")}.webm`;
     downloadBtn.click();
-    console.log("Recording stop .....");
+    // console.log("Recording stop .....");
 }
 
 function stopRecording() {
@@ -78,23 +79,22 @@ function countdownTimer(milliseconds, display) {
     }
 
     formatTime();
-    console.log(countdown);
 
     const interval = setInterval(() => {
         timeLeft -= 1000;
         if (timeLeft < 0) {
             clearInterval(interval);
-            console.log("Countdown ended");
+            // console.log("Countdown ended");
         } else {
             formatTime();
-            console.log(countdown);
+            // console.log(countdown);
             display.innerText = countdown;
         }
     }, 1000);
 
     function stopCountdown() {
         clearInterval(interval);
-        console.log("Countdown stopped");
+        // console.log("Countdown stopped");
     }
 
     return {
@@ -102,52 +102,17 @@ function countdownTimer(milliseconds, display) {
     };
 }
 
-// const h = $(".h");
-// const m = $(".m");
-// const s = $(".s");
-// let timerId = null;
-// let hours = 0,
-//     minutes = 0,
-//     seconds = 0;
-// const clock = {
-//     start: () => {
-//         timerId = setInterval(() => {
-//             seconds++;
-//             if (seconds === 60) {
-//                 seconds = 0;
-//                 minutes++;
-//             }
-//             if (minutes === 60) {
-//                 minutes = 0;
-//                 hours++;
-//             }
-//             h.innerText = hours.toString().padStart(2, "0");
-//             m.innerText = minutes.toString().padStart(2, "0");
-//             s.innerText = seconds.toString().padStart(2, "0");
-//             console.log(
-//                 `${hours.toString().padStart(2, "0")}:${minutes
-//                     .toString()
-//                     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-//             );
-//         }, 1000);
-//     },
-//     reset: () => {
-//         hours = 0;
-//         minutes = 0;
-//         seconds = 0;
-//     },
-//     stop: () => {
-//         clearInterval(timerId);
-//         timerId = null;
-//         hours = 0;
-//         minutes = 0;
-//         seconds = 0;
-//     },
-// };
-// clock.start();
-// clock.reset();
+function setupVideoFeedback() {
+    if (streamGlobal) {
+        const videoFeedback = $(".video-feedback");
+        videoFeedback.srcObject = streamGlobal;
+        videoFeedback.autoplay = true;
+    } else {
+        console.warn("Không có stream: ", streamGlobal);
+    }
+}
 
-$(".click").addEventListener("click", function () {
+$(".test").addEventListener("click", function () {
     // stopRecording();
     // handleMediaRecorder();
     // startRecording();
@@ -167,7 +132,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     }
 
     if (request.title === "info") {
-        console.log(request.name, request.duration);
+        console.log("gửi trước lấy info", request.name, request.duration);
         nameVideo = request.name;
         durationVideo = request.duration;
         $(".nameVideo").innerText = nameVideo;
@@ -178,8 +143,14 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     }
 
     if (request.title === "cutVideo") {
+        console.log("cắt video");
         stopRecording();
         handleMediaRecorder();
         startRecording();
+    }
+
+    if (request.title === "stop") {
+        console.log("video cuối chỉ stop");
+        streamGlobal.getTracks().forEach((track) => track.stop());
     }
 });
