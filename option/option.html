@@ -1,17 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark scroll-smooth">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Recorder extension</title>
+        <link rel="stylesheet" href="./style/main.css" />
     </head>
-    <body>
-        <h1>option page</h1>
-        <a class="download-video-btn btn btn-blue flex-1 text-center disabled"
-            >Download</a
+    <body
+        class="antialiased text-slate-800 dark:text-slate-400 bg-white dark:bg-slate-900"
+    >
+        <!-- BACKGROUND -->
+        <div
+            class="absolute top-0 inset-x-0 flex justify-center overflow-hidden pointer-events-none"
         >
-        <button class="click">click</button>
+            <div class="flex-none flex justify-end">
+                <picture
+                    ><source
+                        srcset="
+                            https://tailwindcss.com/_next/static/media/docs@30.8b9a76a2.avif
+                        "
+                        type="image/avif" />
+                    <img
+                        src="https://tailwindcss.com/_next/static/media/docs@30.8b9a76a2.avif"
+                        alt=""
+                        class="flex-none max-w-none dark:hidden"
+                        decoding="async" /></picture
+                ><picture
+                    ><source
+                        srcset="
+                            https://tailwindcss.com/_next/static/media/docs-dark@30.1a9f8cbf.avif
+                        "
+                        type="image/avif" />
+                    <img
+                        src="https://tailwindcss.com/_next/static/media/docs-dark@30.1a9f8cbf.avif"
+                        alt=""
+                        class="flex-none max-w-none hidden dark:block"
+                        decoding="async"
+                /></picture>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <header class="header-section">
+            <div class="container mx-auto">
+                <div class="header">
+                    <h1
+                        class="text-center font-bold text-5xl text-slate-950 dark:text-slate-200"
+                    >
+                        Screen Recorder
+                    </h1>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN -->
+        <main class="overflow-hidden">
+            <!-- VIDEO RECORDER -->
+            <section class="">
+                <div class="container mx-auto">
+                    <div class="video-recorder">
+                        <!-- TITLE -->
+                        <h2 class="text-2xl font-bold">Video Recorder</h2>
+                        <div class="title flex gap-4">
+                            <p class="nameVideo">Tên video</p>
+                            <div class="timeVideo">00 : 00 : 00</div>
+                        </div>
+
+                        <!-- VIDEO FEEDBACK-->
+                        <video
+                            class="video-feedback bg-black mx-auto w-full h-auto"
+                            src=""
+                            muted
+                            controls
+                        ></video>
+                        <!-- BUTTON -->
+                        <div class="flex gap-4 justify-center items-center">
+                            <a
+                                class="download-video-btn btn btn-blue flex-1 text-center hidden"
+                                >Download</a
+                            >
+                            <button class="click btn btn-blue flex-1">click</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
         <script src="./option.js"></script>
     </body>
 </html>

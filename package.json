@@ -1,0 +1,23 @@
+{
+    "name": "recoder_extension",
+    "version": "1.0.0",
+    "description": "",
+    "main": "background.js",
+    "scripts": {
+        "css": "tailwindcss -i option/style/tailwind.css -o option/style/main.css --watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/vulebaolong/Recorder_extension.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/vulebaolong/Recorder_extension/issues"
+    },
+    "homepage": "https://github.com/vulebaolong/Recorder_extension#readme",
+    "devDependencies": {
+        "tailwindcss": "^3.3.2"
+    }
+}

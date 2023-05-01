@@ -5,28 +5,8 @@ let chunks = [];
 let mediaRecorder;
 let streamGlobal;
 let nameVideo;
-
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-    sendResponse({ reMessage: "phản hồi lại từ option => content" });
-    if (
-        sender.tab.favIconUrl === "https://login.cybersoft.edu.vn/favicon.ico" &&
-        request === "getIDandGetStream"
-    ) {
-        await getStream();
-        handleMediaRecorder();
-        startRecording();
-    }
-
-    if (request.title === "cutVideo") {
-        console.log(request);
-        console.log(request.duration);
-        console.log(request.name);
-        nameVideo = request.name;
-        stopRecording();
-        handleMediaRecorder();
-        startRecording();
-    }
-});
+let durationVideo;
+let timer;
 
 async function getStream() {
     streamGlobal = await navigator.mediaDevices.getDisplayMedia({
@@ -52,9 +32,7 @@ function handleMediaRecorder() {
 
 function handleStop() {
     const blob = new Blob(chunks, { type: "video/webm" });
-
     const downloadBtn = $(".download-video-btn");
-
     downloadBtn.href = URL.createObjectURL(blob);
     downloadBtn.download = `${nameVideo.replace(" ", "_")}.webm`;
     downloadBtn.click();
@@ -64,7 +42,6 @@ function handleStop() {
 function stopRecording() {
     mediaRecorder.stop();
     chunks = [];
-    // test();
 }
 
 function sendMessage(mes) {
@@ -77,29 +54,132 @@ function startRecording() {
     mediaRecorder.start();
 }
 
-function downloadVideo() {
-    // const options = {
-    //     type: "video/webm; codecs=vp9",
-    //     videoBitsPerSecond: 64 * 1024,
-    //     audioBitsPerSecond: 64 * 1024,
-    //     audioChannels: 1,
-    //     audioSampleRate: 48000,
-    //     width: 1258,
-    //     height: 928,
-    // };
+function countdownTimer(milliseconds, display) {
+    let timeLeft = milliseconds;
+    let hours, minutes, seconds, countdown;
 
-    const blob = new Blob(chunks, { type: "video/webm" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    a.href = url;
-    a.download = "recording.webm";
-    a.click();
+    function pad(number) {
+        if (number < 10) {
+            return "0" + number;
+        }
+        return number;
+    }
+
+    function formatTime() {
+        hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        hours = pad(hours);
+        minutes = pad(minutes);
+        seconds = pad(seconds);
+
+        countdown = `${hours} : ${minutes} : ${seconds}`;
+    }
+
+    formatTime();
+    console.log(countdown);
+
+    const interval = setInterval(() => {
+        timeLeft -= 1000;
+        if (timeLeft < 0) {
+            clearInterval(interval);
+            console.log("Countdown ended");
+        } else {
+            formatTime();
+            console.log(countdown);
+            display.innerText = countdown;
+        }
+    }, 1000);
+
+    function stopCountdown() {
+        clearInterval(interval);
+        console.log("Countdown stopped");
+    }
+
+    return {
+        stop: stopCountdown,
+    };
 }
 
+// const h = $(".h");
+// const m = $(".m");
+// const s = $(".s");
+// let timerId = null;
+// let hours = 0,
+//     minutes = 0,
+//     seconds = 0;
+// const clock = {
+//     start: () => {
+//         timerId = setInterval(() => {
+//             seconds++;
+//             if (seconds === 60) {
+//                 seconds = 0;
+//                 minutes++;
+//             }
+//             if (minutes === 60) {
+//                 minutes = 0;
+//                 hours++;
+//             }
+//             h.innerText = hours.toString().padStart(2, "0");
+//             m.innerText = minutes.toString().padStart(2, "0");
+//             s.innerText = seconds.toString().padStart(2, "0");
+//             console.log(
+//                 `${hours.toString().padStart(2, "0")}:${minutes
+//                     .toString()
+//                     .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+//             );
+//         }, 1000);
+//     },
+//     reset: () => {
+//         hours = 0;
+//         minutes = 0;
+//         seconds = 0;
+//     },
+//     stop: () => {
+//         clearInterval(timerId);
+//         timerId = null;
+//         hours = 0;
+//         minutes = 0;
+//         seconds = 0;
+//     },
+// };
+// clock.start();
+// clock.reset();
+
 $(".click").addEventListener("click", function () {
-    stopRecording();
-    handleMediaRecorder();
-    startRecording();
+    // stopRecording();
+    // handleMediaRecorder();
+    // startRecording();
+    timer.stop();
+    countdownTimer(120000, document.querySelector(".timeVideo"));
+});
+
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+    sendResponse({ reMessage: "phản hồi lại từ option => content" });
+    if (
+        sender.tab.favIconUrl === "https://login.cybersoft.edu.vn/favicon.ico" &&
+        request === "getIDandGetStream"
+    ) {
+        await getStream();
+        handleMediaRecorder();
+        startRecording();
+    }
+
+    if (request.title === "info") {
+        console.log(request.name, request.duration);
+        nameVideo = request.name;
+        durationVideo = request.duration;
+        $(".nameVideo").innerText = nameVideo;
+        if (timer) {
+            timer.stop();
+        }
+        timer = countdownTimer(durationVideo, $(".timeVideo"));
+    }
+
+    if (request.title === "cutVideo") {
+        stopRecording();
+        handleMediaRecorder();
+        startRecording();
+    }
 });

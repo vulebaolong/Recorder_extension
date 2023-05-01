@@ -5,31 +5,13 @@ const wait = function (seconds) {
         setTimeout(resolve, seconds);
     });
 };
-
-window.onload = function () {
-    const body = document.querySelector("body");
-    const elementString = `
-    <div class="recorder">
-        <button class="btn_record start_recoding">start recoding</button> 
-        <a href="" class="btn_record download-video-btn">Download</a>
-        <button class="btn_record test123">click</button> 
-        <button class="btn_record send">send</button> 
-    </div>
-    `;
-    body.insertAdjacentHTML("afterbegin", elementString);
-    console.log(body);
-
-    const btn = document.querySelector(".start_recoding");
-    const btn2 = document.querySelector(".test123");
-    const btn3 = document.querySelector(".send");
-    btn.addEventListener("click", () => {});
-
-    btn2.addEventListener("click", async () => {});
-
-    btn3.addEventListener("click", () => {
-        sendMessage("getIDandGetStream");
+async function loadVideo(video) {
+    return new Promise((resolve, reject) => {
+        video.onloadedmetadata = () => {
+            resolve(123);
+        };
     });
-};
+}
 
 function listenerChild(parentEl) {
     return new Promise(function (resolve, reject) {
@@ -84,25 +66,35 @@ async function start() {
             const duration = `${video.duration}`.replace(".", "");
             const name = e.children[0].children[0].innerText;
             console.log(name, +duration);
+            sendMessage({ title: "info", duration, name });
+            await wait(10000);
             // await wait(+duration);
-            await wait(+duration);
-            sendMessage({ title: "cutVideo", duration, name });
+            sendMessage({ title: "cutVideo" });
             console.log("đi tiếp");
             // await wait(+duration);
         }
     }
 }
 
+window.onload = function () {
+    const body = document.querySelector("body");
+    const elementString = `
+    <div class="recorder">
+        <button class="btn_record send">Send</button> 
+    </div>
+    `;
+    body.insertAdjacentHTML("afterbegin", elementString);
+    console.log(body);
+
+    const sendBtn = document.querySelector(".send");
+
+    sendBtn.addEventListener("click", () => {
+        sendMessage("getIDandGetStream");
+    });
+};
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log(request);
     sendResponse({ reMessage: "phản hồi lại từ content => option" });
     start();
 });
-
-async function loadVideo(video) {
-    return new Promise((resolve, reject) => {
-        video.onloadedmetadata = () => {
-            resolve(123);
-        };
-    });
-}
