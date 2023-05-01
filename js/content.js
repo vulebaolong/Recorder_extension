@@ -67,8 +67,8 @@ async function start() {
             const name = e.children[0].children[0].innerText;
             console.log(name, +duration);
             sendMessage({ title: "info", duration, name });
-            await wait(10000);
-            // await wait(+duration);
+            // await wait(10000);
+            await wait(+duration);
             sendMessage({ title: "cutVideo" });
             console.log("đi tiếp");
             // await wait(+duration);
